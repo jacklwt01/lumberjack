@@ -1,0 +1,1106 @@
+.app {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 3rem;
+  color: #e8ecf1;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #2f4058;
+  background: #151c28;
+  color: #9fb0c6;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab:hover {
+  border-color: #4a7eef;
+  color: #dbe7ff;
+}
+
+.tab.active {
+  border-color: #4a7eef;
+  background: rgba(74, 126, 239, 0.2);
+  color: #e8ecf1;
+}
+
+.panel {
+  margin-top: 0.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(145deg, #121826 0%, #0c1018 100%);
+  border: 1px solid #1e2a3a;
+  border-radius: 12px;
+}
+
+.searchRow {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.inputWrap {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #2a3a50;
+  background: #0a0e14;
+  color: #e8ecf1;
+  font-size: 1rem;
+}
+
+.input:focus {
+  outline: 2px solid #3d6fd9;
+  border-color: #3d6fd9;
+}
+
+.btn {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #2f4058;
+  background: #151c28;
+  color: #e8ecf1;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: linear-gradient(180deg, #3d6fd9, #2c52b8);
+  border-color: #4a7eef;
+}
+
+.btn.danger {
+  border-color: #5c2a32;
+  color: #f0b4bc;
+  background: #2a1418;
+}
+
+.banner {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.banner.err {
+  background: #2a1418;
+  border: 1px solid #5c2a32;
+  color: #f0b4bc;
+}
+
+.banner.ok {
+  background: #0f1a14;
+  border: 1px solid #2a5c3a;
+  color: #a8e6c0;
+}
+
+.suggest {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #0c1018;
+  border: 1px solid #243044;
+  border-radius: 10px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.suggestBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border: 0;
+  border-top: 1px solid #182130;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.suggestBtn:hover {
+  background: rgba(74, 126, 239, 0.12);
+}
+
+.mq {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: #8b98a8;
+}
+
+.marketList {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.marketBtn {
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #243044;
+  background: #0f141d;
+  color: inherit;
+  cursor: pointer;
+}
+
+.marketBtn.active {
+  border-color: #4a7eef;
+}
+
+.tableWrap {
+  overflow: auto;
+  margin-top: 0.75rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #1a2433;
+  padding: 0.45rem;
+  text-align: left;
+}
+
+.table th {
+  color: #8b98a8;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: #9aa7b6;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  max-width: 70ch;
+}
+
+.label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #7d8a99;
+  margin-bottom: 0.35rem;
+}
+
+.watchList {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.watchItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #243044;
+  border-radius: 8px;
+  background: #0f141d;
+}
+
+.watchItem button {
+  flex-shrink: 0;
+}
+
+.mono {
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: #7d8a99;
+  word-break: break-all;
+}
+
+.top h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.muted {
+  color: #8b98a8;
+}
+
+.suggestRow {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.suggestRow.err {
+  color: #f0b4bc;
+}
+
+.suggestBtn.active {
+  background: rgba(74, 126, 239, 0.22);
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: #3d4f66;
+  color: #b8c6d9;
+  font-weight: 600;
+}
+
+.btn.ghost:hover:not(:disabled) {
+  border-color: #4a7eef;
+  color: #e8ecf1;
+}
+
+.marketPick {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #1e2a3a;
+}
+
+.marketHead {
+  margin-top: 1.25rem;
+}
+
+.marketHead h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin: 0;
+  font-size: 0.82rem;
+  color: #8b98a8;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #151c28;
+  border: 1px solid #2a3a50;
+  font-size: 0.78rem;
+}
+
+.pill.muted {
+  color: #9aa7b6;
+}
+
+.note {
+  margin: 0.85rem 0 0;
+  font-size: 0.85rem;
+  color: #8b98a8;
+  max-width: 85ch;
+  line-height: 1.5;
+}
+
+.mainSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 1.25rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .mainSplit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.leftPane {
+  min-width: 0;
+}
+
+.rightPane {
+  min-width: 0;
+}
+
+.holder-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  padding: 1rem 1.1rem;
+  background: linear-gradient(145deg, #121826 0%, #0c1018 100%);
+  border: 1px solid #1e2a3a;
+  border-radius: 12px;
+}
+
+.card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.table-kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: #7d8a99;
+}
+
+.empty {
+  margin: 0.5rem 0 0;
+  color: #8b98a8;
+  font-size: 0.88rem;
+}
+
+.colRank {
+  width: 2.25rem;
+}
+
+.colTrader {
+  width: 22%;
+  min-width: 140px;
+}
+
+.colCreated,
+.colFirst {
+  width: 9.5rem;
+}
+
+.colTokens,
+.colAvg {
+  width: 4.5rem;
+}
+
+.colPnl {
+  width: 6.5rem;
+}
+
+.colWin {
+  width: 6rem;
+}
+
+.colReturn {
+  width: 7.25rem;
+  min-width: 6.5rem;
+}
+
+.colAlert {
+  width: 5.5rem;
+}
+
+.returnCell {
+  vertical-align: top;
+  line-height: 1.25;
+}
+
+.returnCell .pos {
+  color: #7dd4a0;
+  font-weight: 600;
+}
+
+.returnCell .neg {
+  color: #f0a8a8;
+  font-weight: 600;
+}
+
+.who .name {
+  font-weight: 600;
+}
+
+.who .addr {
+  display: inline-block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  color: #6ea8ff;
+  text-decoration: none;
+}
+
+.who .addr:hover {
+  text-decoration: underline;
+}
+
+.rowErr {
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: #f0b4bc;
+}
+
+.hint {
+  font-size: 0.72rem;
+  color: #6d7a8a;
+}
+
+.table td.pos {
+  color: #7dd4a0;
+}
+
+.table td.neg {
+  color: #f0a8a8;
+}
+
+.table tbody tr {
+  cursor: pointer;
+}
+
+.table tbody tr:focus-visible {
+  outline: 2px solid #4a7eef;
+  outline-offset: -2px;
+}
+
+.row-active {
+  background: rgba(74, 126, 239, 0.12);
+}
+
+.row-flagged {
+  box-shadow: inset 3px 0 0 #e07a5f;
+}
+
+.alertCell {
+  vertical-align: top;
+}
+
+.alertTag {
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: #1a2433;
+  color: #8b98a8;
+}
+
+.alertTag.hot {
+  background: rgba(224, 122, 95, 0.25);
+  color: #f5c4b8;
+  border: 1px solid rgba(224, 122, 95, 0.45);
+}
+
+.alertMeta {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  color: #6d7a8a;
+  line-height: 1.25;
+}
+
+.chart-panel {
+  padding: 1rem 1.1rem;
+  background: linear-gradient(160deg, #121826 0%, #0c1018 100%);
+  border: 1px solid #1e2a3a;
+  border-radius: 12px;
+}
+
+.chart-panel.sticky {
+  position: sticky;
+  top: 0.75rem;
+}
+
+.chart-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.chart-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: #8b98a8;
+  line-height: 1.4;
+}
+
+.chartToggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.chip {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #2f4058;
+  background: #151c28;
+  color: #9fb0c6;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip.on {
+  border-color: #4a7eef;
+  background: rgba(74, 126, 239, 0.2);
+  color: #e8ecf1;
+}
+
+.chip.disabled,
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.flagBox,
+.exposureBox {
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #3d2a28;
+  background: rgba(224, 122, 95, 0.08);
+  font-size: 0.82rem;
+}
+
+.exposureBox {
+  border-color: #2a3a50;
+  background: rgba(74, 126, 239, 0.06);
+}
+
+.flagTitle,
+.exposureTitle {
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.flagList {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #c9d2dc;
+  line-height: 1.45;
+}
+
+.flagHint {
+  margin-top: 0.45rem;
+  font-size: 0.72rem;
+  color: #7d8a99;
+}
+
+.exposureRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.chart-muted {
+  margin: 0.5rem 0;
+  color: #8b98a8;
+  font-size: 0.88rem;
+}
+
+.chart-err {
+  margin: 0.5rem 0;
+  color: #f0b4bc;
+  font-size: 0.88rem;
+}
+
+.chart-box {
+  margin-top: 0.5rem;
+}
+
+.chartMiniTitle {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #7d8a99;
+}
+
+/* —— Payoff planner tab —— */
+.payoffPlanner {
+  padding-bottom: 2rem;
+}
+
+.payoffToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.payoffHint {
+  font-size: 0.82rem;
+  margin-left: 0.25rem;
+}
+
+.payoffListStack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payoffEmpty {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.payoffListCard {
+  border-color: #243044;
+}
+
+.payoffListHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.payoffListName {
+  flex: 1 1 180px;
+  min-width: 140px;
+  max-width: 320px;
+}
+
+.payoffDragHandle {
+  cursor: grab;
+  border: 1px solid #2f4058;
+  background: #151c28;
+  color: #8b98a8;
+  border-radius: 6px;
+  padding: 0.25rem 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.payoffDragHandle:active {
+  cursor: grabbing;
+}
+
+.payoffGroupStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payoffMini {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.payoffGroupCard {
+  border: 1px solid #243044;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: #0f141d;
+}
+
+.payoffGroupHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.payoffExpandBtn {
+  border: 0;
+  background: transparent;
+  color: #9fb0c6;
+  cursor: pointer;
+  padding: 0.15rem 0.35rem;
+  font-size: 0.85rem;
+}
+
+.payoffGroupName {
+  flex: 1 1 160px;
+  min-width: 120px;
+  max-width: 280px;
+}
+
+.payoffLadderToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #9aa7b6;
+  cursor: pointer;
+}
+
+.payoffCollapsedHint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+}
+
+.payoffAddPanel {
+  margin: 0.65rem 0;
+  padding: 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #243044;
+  background: #0c1018;
+}
+
+.payoffSearchHits {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.payoffSearchHit {
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.5rem;
+  border: 0;
+  border-top: 1px solid #182130;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.payoffSearchHit:hover {
+  background: rgba(74, 126, 239, 0.1);
+}
+
+.payoffWarn {
+  margin: 0.5rem 0;
+  font-size: 0.82rem;
+}
+
+.payoffDeadlineNote {
+  font-size: 0.78rem;
+  margin: 0.5rem 0;
+}
+
+.payoffOrderList {
+  margin: 0.35rem 0 0;
+  padding-left: 1.2rem;
+  line-height: 1.45;
+}
+
+.payoffRunRank {
+  font-weight: 700;
+  color: #8b98a8;
+  font-size: 0.85em;
+}
+
+.payoffMarketDrop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.payoffMarketRow {
+  display: flex;
+  gap: 0.45rem;
+  align-items: flex-start;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #1e2a3a;
+  background: #121826;
+}
+
+.payoffMarketMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.payoffMarketTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-bottom: 0.35rem;
+}
+
+.payoffLiveStrip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  padding: 0.4rem 0.55rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  background: rgba(74, 126, 239, 0.08);
+  border: 1px solid #2a3a50;
+  font-size: 0.82rem;
+}
+
+.payoffLiveLabel {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  color: #8b98a8;
+}
+
+.payoffLiveYes {
+  color: #7dd4a0;
+  font-weight: 600;
+}
+
+.payoffLiveNo {
+  color: #a8c4ff;
+  font-weight: 600;
+}
+
+.payoffLiveStale {
+  font-size: 0.72rem;
+}
+
+.payoffManualEntry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 9rem;
+}
+
+.payoffEntryActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.payoffTinyBtn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+}
+
+.payoffEffectiveLine {
+  margin-bottom: 0.25rem;
+  font-size: 0.78rem;
+  color: #9aa7b6;
+}
+
+.payoffHandle {
+  font-size: 0.75rem;
+}
+
+.payoffMarketFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: flex-end;
+}
+
+.payoffField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7d8a99;
+}
+
+.payoffField .input {
+  min-width: 5rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.payoffOdds {
+  font-size: 0.78rem;
+  min-width: 140px;
+}
+
+.payoffPayoutHint {
+  margin-top: 0.2rem;
+  color: #9aa7b6;
+}
+
+.payoffDelBtn {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.payoffDropFooter {
+  padding: 0.45rem 0.5rem;
+  border-radius: 6px;
+  border: 1px dashed #2f4058;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.payoffDropOver {
+  border-color: #4a7eef;
+  background: rgba(74, 126, 239, 0.08);
+  color: #dbe7ff;
+}
+
+.payoffScenarioSection {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #243044;
+}
+
+.payoffScenarioTitle {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.payoffScenarioMeta {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.payoffScenarioStrip {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.35rem;
+  scroll-snap-type: x proximity;
+}
+
+.payoffScenarioCard {
+  flex: 0 0 auto;
+  min-width: 140px;
+  max-width: 200px;
+  padding: 0.5rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #2a3a50;
+  background: #151c28;
+  scroll-snap-align: start;
+}
+
+.payoffScenarioCard.pos {
+  border-color: rgba(88, 211, 155, 0.45);
+}
+
+.payoffScenarioCard.neg {
+  border-color: rgba(240, 168, 168, 0.45);
+}
+
+.payoffScenarioPnL {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.payoffScenarioLabel {
+  font-size: 0.68rem;
+  color: #8b98a8;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.payoffScenarioPath {
+  font-size: 0.7rem;
+  color: #9fb0c6;
+  margin-bottom: 0.25rem;
+  word-break: break-all;
+}
+
+.payoffScenarioBook {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #dbe7ff;
+  margin-bottom: 0.25rem;
+}
+
+.payoffScenarioBookDetail {
+  font-size: 0.7rem;
+  color: #c9d2dc;
+  line-height: 1.35;
+  margin-bottom: 0.35rem;
+}
+
+.payoffScenarioEventPath {
+  font-size: 0.65rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.payoffScenarioMerged {
+  font-size: 0.65rem;
+  margin-top: 0.2rem;
+}
+
+.payoffScenarioReturn {
+  font-size: 0.72rem;
+  color: #b8c6d9;
+  margin-bottom: 0.2rem;
+}
+
+.payoffProbTableWrap {
+  margin: 0.65rem 0;
+  overflow: auto;
+}
+
+.payoffProbTable {
+  width: 100%;
+  max-width: 420px;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.payoffProbTable th,
+.payoffProbTable td {
+  border: 1px solid #243044;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+
+.payoffProbTable th {
+  color: #8b98a8;
+  font-weight: 600;
+}
+
+.payoffProbFoot {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  max-width: 48ch;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

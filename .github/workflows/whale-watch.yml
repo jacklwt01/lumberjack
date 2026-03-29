@@ -1,0 +1,38 @@
+# Optional: run whale watcher on a schedule from GitHub Actions.
+# Add repo secrets: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM, EMAIL_TO, POLYMARKET_MARKETS
+# Note: snapshots reset each run unless you commit watcher/data or use external storage.
+
+name: Whale watch
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: watcher/package-lock.json
+      - name: Install
+        working-directory: watcher
+        run: npm ci
+      - name: Run watcher
+        working-directory: watcher
+        env:
+          POLYMARKET_MARKETS: ${{ secrets.POLYMARKET_MARKETS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          TOP_HOLDERS_LIMIT: ${{ secrets.TOP_HOLDERS_LIMIT }}
+          MIN_CHANGE_USD: ${{ secrets.MIN_CHANGE_USD }}
+        run: npm run start

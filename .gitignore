@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+myenv/
+watcher/node_modules/
+watcher/data/
+data/alert-subscription.json
+*.log
