@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   Line,
   LineChart,
@@ -15,15 +15,16 @@ import {
   type PositionRow,
   type PositionSeriesPoint,
   type PublicProfile,
+  type PolymarketOfficialPnl,
   type SearchMarketRow,
   type TraderStats,
   type WalletPositionValuePoint,
   formatAddress,
   formatUsd,
-  formatTs,
   getFirstMarketTrade,
   getMarketMetrics,
   getMarketPositionSeries,
+  getPolymarketOfficialPnl,
   getPositionsForMarketWallet,
   getPublicProfile,
   getTopHolders,
@@ -42,6 +43,7 @@ type EnrichedRow = {
   firstTradeAt: number | null
   position: PositionRow | null
   stats: TraderStats | null
+  polymarketPnl: PolymarketOfficialPnl | null
   pctOfMarketOi?: number | null
   pctOfMarketVolume?: number | null
   whaleFlag?: { flagged: boolean; reasons: string[] }
@@ -112,7 +114,7 @@ function whaleFlagForRow(r: EnrichedRow): { flagged: boolean; reasons: string[] 
   const cap = s?.closedCapitalContributed ?? 0
   const n = s?.closedPositionsSampled ?? 0
 
-  // Suspicious signals use closed-book return (realized PnL vs est. capital), not current market size / OI share.
+  // Suspicious signals use merged-book return (PnL incl. open MTM vs est. capital), not current market size / OI share.
   const strongReturnCombo =
     ret != null &&
     cap >= 500 &&
@@ -123,26 +125,26 @@ function whaleFlagForRow(r: EnrichedRow): { flagged: boolean; reasons: string[] 
     ret >= 40
   if (strongReturnCombo) {
     reasons.push(
-      `Strong efficiency: ${formatSignedReturnPct(ret!)} on capital with ${(winRate! * 100).toFixed(1)}% win rate (${winDenom} resolved, sampled).`
+      `Strong efficiency: ${formatSignedReturnPct(ret!)} on capital with ${(winRate! * 100).toFixed(1)}% win rate (${winDenom} book legs, sampled).`
     )
   } else if (ret != null && cap >= 600 && n >= 10) {
     if (ret >= 130) {
       reasons.push(
-        `Extreme lifetime return (${formatSignedReturnPct(ret)}) vs ~${formatUsd(cap)} est. capital in ${n} sampled closes.`
+        `Extreme lifetime return (${formatSignedReturnPct(ret)}) vs ~${formatUsd(cap)} est. capital in ${n} sampled book legs.`
       )
     } else if (ret >= 75) {
       reasons.push(
-        `High return (${formatSignedReturnPct(ret)}) vs ~${formatUsd(cap)} est. capital (${n} sampled closes).`
+        `High return (${formatSignedReturnPct(ret)}) vs ~${formatUsd(cap)} est. capital (${n} sampled book legs).`
       )
     }
   }
   if (winRate != null && winDenom >= 10 && winRate >= 0.75) {
-    reasons.push(`High win rate (${(winRate * 100).toFixed(1)}%) on ${winDenom} resolved positions (sampled).`)
+    reasons.push(`High win rate (${(winRate * 100).toFixed(1)}%) on ${winDenom} book legs (closed + open MTM, sampled).`)
   }
-  if (lifetime != null && lifetime >= 25_000) reasons.push(`Large lifetime realized PnL (${formatUsd(lifetime)}).`)
-  if (recent != null && recent >= 5_000) reasons.push(`Large 30d realized PnL (${formatUsd(recent)}).`)
+  if (lifetime != null && lifetime >= 25_000) reasons.push(`Large lifetime book PnL (${formatUsd(lifetime)}).`)
+  if (recent != null && recent >= 5_000) reasons.push(`Large 30d book PnL (${formatUsd(recent)}).`)
   if (markets != null && markets > 0 && markets <= 6) {
-    reasons.push(`Concentrated history: only ${markets} unique markets in sampled closed positions.`)
+    reasons.push(`Concentrated history: only ${markets} unique markets in sampled book legs.`)
   }
 
   const uniq = [...new Set(reasons)]
@@ -345,15 +347,26 @@ export default function MainDashboard() {
       const meta = await getTopHolders(m.conditionId, TOP_HOLDERS)
       setMetaHolders(meta)
       const flat = flattenHolders(meta)
-      const profileCache = new Map<string, PublicProfile | null>()
-      const statsCache = new Map<string, TraderStats>()
+      type WalletBundle = {
+        profile: PublicProfile | null
+        stats: TraderStats
+        polymarketPnl: PolymarketOfficialPnl
+      }
+      const walletBundle = new Map<string, WalletBundle>()
 
       const enrichedRows = await poolMap(flat, 4, async ({ holder, outcomeIndex }) => {
         const w = holder.proxyWallet
         let err: string | undefined
         try {
-          if (!profileCache.has(w)) profileCache.set(w, await getPublicProfile(w))
-          if (!statsCache.has(w)) statsCache.set(w, await getTraderClosedStats(w))
+          if (!walletBundle.has(w)) {
+            const [profile, stats, polymarketPnl] = await Promise.all([
+              getPublicProfile(w),
+              getTraderClosedStats(w),
+              getPolymarketOfficialPnl(w),
+            ])
+            walletBundle.set(w, { profile, stats, polymarketPnl })
+          }
+          const wb = walletBundle.get(w)!
           const [first, posList] = await Promise.all([
             getFirstMarketTrade(w, m.conditionId),
             getPositionsForMarketWallet(w, m.conditionId),
@@ -362,10 +375,11 @@ export default function MainDashboard() {
           const row: EnrichedRow = {
             holder,
             outcomeIndex,
-            profile: profileCache.get(w) ?? null,
+            profile: wb.profile,
             firstTradeAt: first?.timestamp ?? null,
             position,
-            stats: statsCache.get(w) ?? null,
+            stats: wb.stats,
+            polymarketPnl: wb.polymarketPnl,
           }
           const usd = positionUsd(row)
           row.pctOfMarketOi =
@@ -376,13 +390,15 @@ export default function MainDashboard() {
           return row
         } catch (e) {
           err = e instanceof Error ? e.message : 'Row failed'
+          const wb = walletBundle.get(w)
           const row: EnrichedRow = {
             holder,
             outcomeIndex,
-            profile: profileCache.get(w) ?? null,
+            profile: wb?.profile ?? null,
             firstTradeAt: null,
             position: null,
-            stats: statsCache.get(w) ?? null,
+            stats: wb?.stats ?? null,
+            polymarketPnl: wb?.polymarketPnl ?? null,
             error: err,
           }
           const usd = positionUsd(row)
@@ -601,11 +617,10 @@ export default function MainDashboard() {
 
       {selected && holderGroups.length > 0 && (
         <p className="note">
-          Win rate, PnL, and <strong>return on capital</strong> use <strong>sampled closed positions</strong>{' '}
-          (capital ≈ sum of totalBought×avgPrice per close when the API provides those fields). Whale flags emphasize
-          unusual returns and history, not how large their stake is in <em>this</em> market. Click a row for{' '}
-          <strong>cumulative position from trades</strong> (BUY adds, SELL reduces). Press Esc to close the chart
-          panel.
+          Each PnL column shows <strong>two lines</strong>: our <strong>merged book</strong> (see README) and{' '}
+          <strong>PM</strong> = Polymarket’s <code>/v1/leaderboard</code> figure for this proxy wallet (month = calendar{' '}
+          <code>MONTH</code>, all-time = <code>ALL</code>). Win rate, return %, and whale flags still use the book only.
+          Click a row for cumulative position from trades. Press Esc to close the chart panel.
         </p>
       )}
 
@@ -678,8 +693,8 @@ export default function MainDashboard() {
                   ))}
                 </ul>
                 <div className="flagHint">
-                  Heuristic only. Based on sampled closes (may be truncated); large positions here are context only,
-                  not a flag signal.
+                  Heuristic only. Based on merged closed + dust-open book stats (may be truncated); large positions here
+                  are context only, not a flag signal.
                 </div>
               </div>
             )}
@@ -902,7 +917,9 @@ export default function MainDashboard() {
         </aside>
       </div>
 
-      {loadingHolders && <div className="panel muted">Fetching holder lists and per-wallet stats…</div>}
+      {loadingHolders && (
+        <div className="panel muted">Fetching holder lists, merged book stats, and Polymarket leaderboard PnL…</div>
+      )}
 
       {selected &&
         !loadingHolders &&
@@ -912,6 +929,30 @@ export default function MainDashboard() {
           <div className="banner">No top holders were returned for this market.</div>
         )}
     </>
+  )
+}
+
+function PnlBookPmCell({
+  book,
+  pm,
+  bookSuffix,
+}: {
+  book: number | undefined | null
+  pm: number | null | undefined
+  bookSuffix?: ReactNode
+}) {
+  const bookOk = book != null && Number.isFinite(book)
+  const pmOk = pm != null && Number.isFinite(pm)
+  return (
+    <div className="pnlStack">
+      <div className={`pnlBook ${pnlClass(book ?? undefined)}`}>
+        {bookOk ? formatUsd(book) : '—'}
+        {bookSuffix}
+      </div>
+      <div className={`pnlPmRow ${pnlClass(pm ?? undefined)}`}>
+        <span className="pnlPmTag">PM</span> {pmOk ? formatUsd(pm) : '—'}
+      </div>
+    </div>
   )
 }
 
@@ -938,8 +979,8 @@ function HolderTable({
     <section className="card">
       <h3>{title}</h3>
       <p className="table-kicker">Select a row to open charts on the right.</p>
-      <div className="tableWrap">
-        <table className="table">
+      <div className="tableWrap tableWrap--holders">
+        <table className="table table--holders">
           <colgroup>
             <col className="colRank" />
             <col className="colTrader" />
@@ -947,8 +988,8 @@ function HolderTable({
             <col className="colFirst" />
             <col className="colTokens" />
             <col className="colAvg" />
-            <col className="colPnl" />
-            <col className="colPnl" />
+            <col className="colPnlStack" />
+            <col className="colPnlStack" />
             <col className="colWin" />
             <col className="colReturn" />
             <col className="colAlert" />
@@ -957,19 +998,32 @@ function HolderTable({
             <tr>
               <th>#</th>
               <th>Trader</th>
-              <th>Created</th>
-              <th>First in market</th>
-              <th>Tokens</th>
+              <th>Joined</th>
+              <th>1st here</th>
+              <th>Tkn</th>
               <th>Avg</th>
-              <th>30d realized</th>
-              <th>Lifetime realized</th>
-              <th>Win rate</th>
               <th
-                title={`Lifetime realized PnL ÷ estimated capital deployed on sampled closes (totalBought×avgPrice per position). Shown when est. capital ≥ $${CLOSED_CAPITAL_MIN_FOR_RETURN_PCT}.`}
+                className="thStack"
+                title="Book: rolling ~30d (dated closes + open MTM snapshot). PM: leaderboard timePeriod=MONTH (calendar month, not rolling 30d)."
               >
-                Return vs capital
+                <span className="thMain">30d</span>
+                <span className="thSub">book · PM mo.</span>
               </th>
-              <th>Whale alert</th>
+              <th className="thStack" title="Book: merged lifetime. PM: leaderboard timePeriod=ALL (profile-style).">
+                <span className="thMain">Life</span>
+                <span className="thSub">book · PM all</span>
+              </th>
+              <th
+                title="Wins/losses on merged book legs only (closed + dust + active cashPnl)."
+              >
+                Win %
+              </th>
+              <th
+                title={`Book lifetime ÷ est. capital (totalBought×avgPrice or initialValue). Shown when capital ≥ $${CLOSED_CAPITAL_MIN_FOR_RETURN_PCT}.`}
+              >
+                Rtn vs cap
+              </th>
+              <th>Alert</th>
             </tr>
           </thead>
           <tbody>
@@ -1006,25 +1060,36 @@ function HolderTable({
                     </a>
                     {r.error && <div className="rowErr">{r.error}</div>}
                   </td>
-                  <td>
+                  <td className="tdCompact">
                     {r.profile?.createdAt
-                      ? new Date(r.profile.createdAt).toLocaleString(undefined, {
-                          dateStyle: 'medium',
-                          timeStyle: 'short',
+                      ? new Date(r.profile.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          year: '2-digit',
                         })
                       : '—'}
                   </td>
-                  <td>{r.firstTradeAt ? formatTs(r.firstTradeAt) : '—'}</td>
+                  <td className="tdCompact">
+                    {r.firstTradeAt
+                      ? new Date(r.firstTradeAt * 1000).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })
+                      : '—'}
+                  </td>
                   <td>
                     {r.position?.size != null ? r.position.size.toFixed(2) : r.holder.amount.toFixed(2)}
                   </td>
                   <td>{r.position?.avgPrice != null ? r.position.avgPrice.toFixed(3) : '—'}</td>
-                  <td className={pnlClass(r.stats?.recentRealizedPnl)}>
-                    {r.stats ? formatUsd(r.stats.recentRealizedPnl) : '—'}
+                  <td className="colPnlStack">
+                    <PnlBookPmCell book={r.stats?.recentRealizedPnl} pm={r.polymarketPnl?.pnlMonth} />
                   </td>
-                  <td className={pnlClass(r.stats?.lifetimeRealizedPnl)}>
-                    {r.stats ? formatUsd(r.stats.lifetimeRealizedPnl) : '—'}
-                    {r.stats?.truncated && <span className="hint"> · sample cap</span>}
+                  <td className="colPnlStack">
+                    <PnlBookPmCell
+                      book={r.stats?.lifetimeRealizedPnl}
+                      pm={r.polymarketPnl?.pnlAll}
+                      bookSuffix={r.stats?.truncated ? <span className="hint"> · cap</span> : null}
+                    />
                   </td>
                   <td>
                     {winRatePct(r.stats) ?? '—'}

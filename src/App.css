@@ -1,5 +1,5 @@
 .app {
-  max-width: 1600px;
+  max-width: min(100%, 1760px);
   margin: 0 auto;
   padding: 1.25rem 1.25rem 3rem;
   color: #e8ecf1;
@@ -187,10 +187,25 @@
   margin-top: 0.75rem;
 }
 
+.holder-stack .tableWrap--holders {
+  overflow-x: visible;
+}
+
+@media (max-width: 1100px) {
+  .holder-stack .tableWrap--holders {
+    overflow-x: auto;
+  }
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
+}
+
+.table--holders {
+  table-layout: fixed;
+  font-size: 0.78rem;
 }
 
 .table th,
@@ -338,7 +353,7 @@
 
 .mainSplit {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
   gap: 1.25rem;
   align-items: start;
   margin-top: 1rem;
@@ -393,35 +408,95 @@
 }
 
 .colTrader {
-  width: 22%;
-  min-width: 140px;
+  width: 18%;
+  min-width: 108px;
 }
 
 .colCreated,
 .colFirst {
-  width: 9.5rem;
+  width: 3.35rem;
 }
 
 .colTokens,
 .colAvg {
-  width: 4.5rem;
+  width: 2.85rem;
 }
 
-.colPnl {
-  width: 6.5rem;
+.colPnlStack {
+  width: 5.85rem;
 }
 
 .colWin {
-  width: 6rem;
+  width: 4.35rem;
 }
 
 .colReturn {
-  width: 7.25rem;
-  min-width: 6.5rem;
+  width: 5.5rem;
+  min-width: 4.5rem;
 }
 
 .colAlert {
-  width: 5.5rem;
+  width: 4.35rem;
+}
+
+.thStack {
+  vertical-align: bottom;
+  line-height: 1.2;
+}
+
+.thMain {
+  display: block;
+  font-size: 0.68rem;
+}
+
+.thSub {
+  display: block;
+  margin-top: 0.12rem;
+  font-weight: 600;
+  font-size: 0.58rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  color: #9aa7b6;
+}
+
+.tdCompact {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.pnlStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  line-height: 1.2;
+}
+
+.pnlBook {
+  font-weight: 600;
+  font-size: 0.76rem;
+}
+
+.pnlPmRow {
+  font-size: 0.68rem;
+  color: #a8b4c4;
+}
+
+.pnlPmTag {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #6d7a8a;
+  margin-right: 0.15rem;
+}
+
+.pnlStack .pnlBook.pos,
+.pnlStack .pnlPmRow.pos {
+  color: #7dd4a0;
+}
+
+.pnlStack .pnlBook.neg,
+.pnlStack .pnlPmRow.neg {
+  color: #f0a8a8;
 }
 
 .returnCell {
