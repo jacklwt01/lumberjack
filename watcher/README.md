@@ -39,6 +39,17 @@ Optional: `BASELINE_ONLY=true` to only refresh snapshots without sending **any**
 npm run start
 ```
 
+## GitHub Actions personal watchlist (keep repo defaults empty)
+
+If you enable `.github/workflows/whale-watch.yml`, keep the repository itself generic and put your private watchlist in **GitHub Actions secrets**:
+
+1. Open your repo on GitHub: **Settings → Secrets and variables → Actions → New repository secret**
+2. Add `POLYMARKET_MARKETS` as a comma-separated list of condition IDs
+3. Add mail secrets (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `EMAIL_TO`)
+4. Leave `.env.example` and tracked files without your personal market list
+
+The workflow now skips automatically when `POLYMARKET_MARKETS` is empty, so forks/other users won't get failures by default.
+
 ## Schedule (Windows Task Scheduler)
 
 Create a task that runs every 10–15 minutes:

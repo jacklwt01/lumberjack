@@ -22,7 +22,11 @@ jobs:
       - name: Install
         working-directory: watcher
         run: npm ci
+      - name: Skip if no markets configured
+        if: ${{ secrets.POLYMARKET_MARKETS == '' }}
+        run: echo "No POLYMARKET_MARKETS secret set; skipping watcher run."
       - name: Run watcher
+        if: ${{ secrets.POLYMARKET_MARKETS != '' }}
         working-directory: watcher
         env:
           POLYMARKET_MARKETS: ${{ secrets.POLYMARKET_MARKETS }}
