@@ -24,6 +24,12 @@ function clampPrice(p: number): number {
   return Math.min(0.99, Math.max(0.01, p))
 }
 
+function yesProb(m: PayoffMarketEntry, q: MarketLiveQuote | undefined): number {
+  const ov = m.manualYesProb
+  if (ov != null && Number.isFinite(ov) && ov > 0 && ov < 1) return clampPrice(ov)
+  return q ? clampPrice(q.yesPrice) : 0.5
+}
+
 /** Price used for shares = principal / price (your book, not mark-to-market). */
 export function effectiveEntryPrice(
   entry: PayoffMarketEntry,
@@ -295,12 +301,12 @@ export function naiveMarginalEV(
     if (!q) continue
     any = true
     if (m.side === 'YES') {
-      const price = clampPrice(q.yesPrice)
+      const price = yesProb(m, q)
       const entry = effectiveEntryPrice(m, q) ?? price
       const shares = m.principal / entry
       ev += price * (shares - m.principal) + (1 - price) * -m.principal
     } else {
-      const price = clampPrice(q.noPrice)
+      const price = clampPrice(1 - yesProb(m, q))
       const entry = effectiveEntryPrice(m, q) ?? price
       const shares = m.principal / entry
       ev += price * (shares - m.principal) + (1 - price) * -m.principal
@@ -322,7 +328,7 @@ export function ladderConditionalProbs(
   for (let k = 0; k < order.length; k++) {
     const m = markets[order[k]]
     const q = quotes.get(m.conditionId)
-    const pByTk = q ? clampPrice(q.yesPrice) : 0.5
+    const pByTk = yesProb(m, q)
     const denom = Math.max(1e-6, 1 - prevPBy)
     const condYes =
       k === 0 ? pByTk : Math.max(0, Math.min(1, (pByTk - prevPBy) / denom))
@@ -334,4 +340,44 @@ export function ladderConditionalProbs(
     prevPBy = pByTk
   }
   return rows
+}
+
+/**
+ * Implied ladder timeline probabilities from chained “by date” YES prices.
+ *
+ * Let p_k = P(event happens by deadline k) ≈ YES_price(k), in your list order (earliest → latest).
+ * Then the event timeline has n+1 mutually exclusive buckets:
+ * - s=0: by first deadline:            P0 = p0
+ * - 0<s<n: between s-1 and s:          Ps = max(0, p_s - p_{s-1})
+ * - s=n: after last deadline (never):  Pn = max(0, 1 - p_{n-1})
+ *
+ * We also enforce monotonicity for p_k by taking p_k := max(p_k, p_{k-1}) so buckets are non-negative.
+ * This is a “pricing sketch”, not a calibrated model.
+ */
+export function ladderTimelineProbs(
+  markets: PayoffMarketEntry[],
+  quotes: Map<string, MarketLiveQuote>
+): { bucketProbs: number[]; pBy: number[] } {
+  const order = ladderOrderIndices(markets)
+  const n = order.length
+  if (n === 0) return { bucketProbs: [], pBy: [] }
+
+  const pBy: number[] = []
+  let prev = 0
+  for (let k = 0; k < n; k++) {
+    const m = markets[order[k]]
+    const q = quotes.get(m.conditionId)
+    const raw = yesProb(m, q)
+    const pk = Math.max(prev, raw)
+    pBy.push(pk)
+    prev = pk
+  }
+
+  const bucketProbs: number[] = []
+  for (let s = 0; s <= n; s++) {
+    if (s === 0) bucketProbs.push(pBy[0] ?? 0)
+    else if (s === n) bucketProbs.push(Math.max(0, 1 - (pBy[n - 1] ?? 0)))
+    else bucketProbs.push(Math.max(0, (pBy[s] ?? 0) - (pBy[s - 1] ?? 0)))
+  }
+  return { bucketProbs, pBy }
 }

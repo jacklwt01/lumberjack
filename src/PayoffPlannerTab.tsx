@@ -32,6 +32,7 @@ import {
   buildUserBookScenarios,
   effectiveEntryPrice,
   ladderConditionalProbs,
+  ladderTimelineProbs,
   ladderOrderIndices,
   naiveMarginalEV,
   scenarioSummaryPnL,
@@ -416,6 +417,34 @@ function SortableListCard({
   const principal = totalPrincipalAtRisk(list.markets)
   const naiveEv = naiveMarginalEV(list.markets, quotes)
   const condRows = ladderConditionalProbs(list.markets, quotes)
+  const ladderBuckets = ladderTimelineProbs(list.markets, quotes)
+  const ladderEligible = useMemo(() => {
+    const ids = list.markets
+      .map((m) => m.eventSlug || m.eventTitle)
+      .filter((s) => typeof s === 'string' && s.trim().length > 0)
+    if (ids.length === 0) return true
+    return ids.every((s) => s === ids[0])
+  }, [list.markets])
+  const ladderEv = useMemo(() => {
+    if (!ladderEligible) return null
+    if (rawTimelines.length === 0) return null
+    const probs = ladderBuckets.bucketProbs
+    if (probs.length !== rawTimelines.length) return null
+    const probByBook = new Map<string, number>()
+    rawTimelines.forEach((tl, i) => {
+      const k = tl.userBookPath || tl.id
+      probByBook.set(k, (probByBook.get(k) ?? 0) + (probs[i] ?? 0))
+    })
+    let ev = 0
+    scenarios.forEach((sc) => {
+      const p = probByBook.get(sc.userBookPath || sc.id) ?? 0
+      ev += p * sc.pnl
+    })
+    return ev
+  }, [ladderBuckets.bucketProbs, ladderEligible, rawTimelines, scenarios])
+  const bestEv = ladderEv ?? naiveEv
+  const bestEvLabel = ladderEv != null ? 'Ladder EV' : 'Independent EV'
+  const bestEvReturnPct = principal > 0 && bestEv != null ? (100 * bestEv) / principal : null
   const orderIdx = ladderOrderIndices(list.markets)
   const [positionBookOpen, setPositionBookOpen] = useState(true)
 
@@ -581,7 +610,19 @@ function SortableListCard({
           {naiveEv != null && (
             <>
               {' '}
-              · naive marginal EV (sketch): <strong>{formatUsd(naiveEv)}</strong>
+              · independent EV (assumes markets independent): <strong>{formatUsd(naiveEv)}</strong>
+            </>
+          )}
+          {ladderEv != null && (
+            <>
+              {' '}
+              · ladder EV (from live tenor prices): <strong>{formatUsd(ladderEv)}</strong>
+            </>
+          )}
+          {!ladderEligible && (
+            <>
+              {' '}
+              · <span className="hint">ladder EV disabled (mixed events; using independence)</span>
             </>
           )}
         </p>
@@ -589,9 +630,48 @@ function SortableListCard({
           {scenarios.map((sc) => (
             <ScenarioCard key={sc.id} sc={sc} totalPrincipal={principal} />
           ))}
+          <EvSummaryCard
+            ev={bestEv}
+            evLabel={bestEvLabel}
+            retPct={bestEvReturnPct}
+            principal={principal}
+            ladderEligible={ladderEligible}
+          />
         </div>
       </div>
     </section>
+  )
+}
+
+function EvSummaryCard({
+  ev,
+  evLabel,
+  retPct,
+  principal,
+  ladderEligible,
+}: {
+  ev: number | null | undefined
+  evLabel: string
+  retPct: number | null
+  principal: number
+  ladderEligible: boolean
+}) {
+  const showEv = ev != null && Number.isFinite(ev)
+  const showRet = retPct != null && Number.isFinite(retPct)
+  const cls = showEv ? (ev! >= 0 ? 'pos' : 'neg') : ''
+  return (
+    <div className={`payoffScenarioCard payoffEvCard ${cls}`}>
+      <div className="payoffEvTitle">{evLabel}</div>
+      <div className="payoffScenarioPnL">{showEv ? formatUsd(ev!) : '—'}</div>
+      <div className="payoffEvSub">
+        Exp. return on risked capital:{' '}
+        <strong>{showRet ? `${retPct!.toFixed(2)}%` : '—'}</strong>
+      </div>
+      <div className="payoffEvSub muted">
+        Risked principal: <strong>{principal > 0 ? formatUsd(principal) : '—'}</strong>
+      </div>
+      {!ladderEligible && <div className="payoffEvFoot muted">Mixed events → ladder disabled</div>}
+    </div>
   )
 }
 
@@ -752,6 +832,48 @@ function SortableMarketRow({
                 }}
               >
                 Snap to live {market.side || '…'}
+              </button>
+            </div>
+          </div>
+          <div className="payoffManualEntry">
+            <label className="payoffField">
+              Prob YES % (EV)
+              <input
+                className="input"
+                type="number"
+                min={1}
+                max={99}
+                step={0.1}
+                value={market.manualYesProb != null ? (market.manualYesProb * 100).toString() : ''}
+                placeholder="— uses live YES —"
+                onChange={(e) => {
+                  const v = e.target.value.trim()
+                  if (!v) {
+                    onPatch({ manualYesProb: null })
+                    return
+                  }
+                  const pct = Number(v)
+                  if (!Number.isFinite(pct)) return
+                  onPatch({ manualYesProb: pct / 100 })
+                }}
+              />
+            </label>
+            <div className="payoffEntryActions">
+              <button
+                type="button"
+                className="btn ghost payoffTinyBtn"
+                disabled={market.manualYesProb == null}
+                onClick={() => onPatch({ manualYesProb: null })}
+              >
+                Use live
+              </button>
+              <button
+                type="button"
+                className="btn ghost payoffTinyBtn"
+                disabled={!quote}
+                onClick={() => quote && onPatch({ manualYesProb: quote.yesPrice })}
+              >
+                Snap YES
               </button>
             </div>
           </div>

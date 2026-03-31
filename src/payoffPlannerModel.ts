@@ -21,6 +21,11 @@ export type PayoffMarketEntry = {
    * If unset, live quote for that side is used until you fill this in.
    */
   avgEntryPrice: number | null
+  /**
+   * Optional manual override for implied P(YES) used in EV calculations.
+   * Stored as 0–1 (e.g. 0.6 = 60%). If null, uses live YES price.
+   */
+  manualYesProb: number | null
 }
 
 export type PayoffList = {
@@ -90,6 +95,7 @@ function normalizeEntry(m: PayoffMarketEntry): PayoffMarketEntry {
   return {
     ...m,
     avgEntryPrice: m.avgEntryPrice ?? null,
+    manualYesProb: m.manualYesProb ?? null,
   }
 }
 
@@ -160,5 +166,6 @@ export function entryFromSearch(row: {
     side: '',
     principal: 0,
     avgEntryPrice: null,
+    manualYesProb: null,
   }
 }
