@@ -1076,6 +1076,32 @@
   scroll-snap-align: start;
 }
 
+.payoffEvCard {
+  min-width: 210px;
+  max-width: 260px;
+  border-style: dashed;
+}
+
+.payoffEvTitle {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8b98a8;
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.payoffEvSub {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  margin-top: 0.25rem;
+}
+
+.payoffEvFoot {
+  font-size: 0.68rem;
+  margin-top: 0.35rem;
+}
+
 .payoffScenarioCard.pos {
   border-color: rgba(88, 211, 155, 0.45);
 }

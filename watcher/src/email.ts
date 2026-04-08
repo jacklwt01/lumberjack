@@ -141,7 +141,7 @@ export async function sendAlertEmail(opts: {
     </p>
     ${opts.blocks.map(blockHtml).join('')}
     <p style="color:#7d8a99;font-size:12px;margin-top:24px">
-      Suggestions: manage markets and email in the dashboard Whale alerts tab; run the watcher every 5–15 minutes; or use GitHub Actions;
+      Suggestions: manage markets and email in the dashboard Whale alerts tab; run the watcher every 5–15 minutes (Task Scheduler, cron, or a small VPS);
       tighten MIN_CHANGE_USD to reduce noise; use a dedicated alerts inbox and SMTP from your domain (SPF/DKIM).
     </p>
   </div>
